@@ -27,13 +27,12 @@
 
 #### 1. Install server
   ```shell
-  $ yarn add express
-  $ yarn add @raito-cache/expressjs
+  $ yarn add @raito-cache/client
   ```
 
 #### 2. Connect to Raito
 ```typescript
-import { Raito } from '@raito-cache/expressjs';
+import { Raito } from '@raito-cache/client';
 
 const raito = new Raito(); // defaul connection is localhost:9180
 ```
@@ -57,7 +56,7 @@ new Raito({
 
 **Raito class**
 ```typescript
-import { Raito } from '@raito-cache/expressjs';
+import { Raito } from '@raito-cache/client';
 
 const raito = new Raito();
 
