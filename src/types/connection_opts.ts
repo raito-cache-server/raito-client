@@ -2,6 +2,7 @@ export type ConnectionOptions = {
   host?: string;
   port?: number;
   ttl?: number;
+  password?: string;
 };
 
 export type ConnectionString =
@@ -22,5 +23,5 @@ export const isConnectionOptions = (
 ): options is ConnectionOptions => {
   if (typeof options !== 'object' || options === null) return false;
   const keys = Object.keys(options);
-  return keys.every((key) => ['host', 'port', 'ttl'].includes(key));
+  return keys.every((key) => ['host', 'port', 'ttl', 'password'].includes(key));
 };

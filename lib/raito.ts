@@ -1,14 +1,14 @@
 import {
   ConnectionOptions,
-  ICache,
-  IRaito,
-  WsMessage,
-  WsResult,
-  RaitoOptions,
-  isConnectionString,
   ConnectionString,
   connectionStringRegex,
+  ICache,
+  IRaito,
   isConnectionOptions,
+  isConnectionString,
+  RaitoOptions,
+  WsMessage,
+  WsResult,
 } from '@src/types';
 import WebSocket from 'ws';
 import { RaitoResultException } from './RaitoResultException';
@@ -40,8 +40,7 @@ export class Raito implements IRaito {
       args: [key],
     };
 
-    this.wss.send(JSON.stringify(message));
-    return await this.handleResult();
+    return await this.handleResult(message);
   }
 
   public async set(key: string, data: any, ttl?: number): Promise<void> {
@@ -52,8 +51,7 @@ export class Raito implements IRaito {
       args: [key, data, (ttl ?? this.options?.ttl)?.toString()],
     };
 
-    this.wss.send(JSON.stringify(message));
-    await this.handleResult();
+    await this.handleResult(message);
   }
 
   public async clear(key: string): Promise<void> {
@@ -64,8 +62,7 @@ export class Raito implements IRaito {
       args: [key],
     };
 
-    this.wss.send(JSON.stringify(message));
-    await this.handleResult();
+    await this.handleResult(message);
   }
 
   public shutdown(): void {
@@ -77,9 +74,30 @@ export class Raito implements IRaito {
     }
   }
 
+  private async authenticate() {
+    const message: WsMessage = {
+      command: 'auth',
+      args: [this.options.password || ''],
+    };
+
+    this.wss.send(JSON.stringify(message));
+
+    return new Promise<void>((resolve, reject) => {
+      this.wss.once('message', (message) => {
+        const { error, success } = JSON.parse(message.toString()) as WsResult;
+        if (success) {
+          resolve();
+          return;
+        }
+        reject(new RaitoConnectionException(error || 'Authentication failed'));
+      });
+    });
+  }
+
   private handleConnection() {
-    this.wss.on('open', () => {
+    this.wss.on('open', async () => {
       this.isConnected = true;
+      await this.authenticate();
     });
 
     this.wss.on('close', () => {
@@ -98,7 +116,7 @@ export class Raito implements IRaito {
     });
   }
 
-  private async handleResult(): Promise<ICache | null> {
+  private async handleResult(message: WsMessage): Promise<ICache | null> {
     return new Promise<ICache | null>((resolve, reject) => {
       this.wss.once('message', (message) => {
         const { error, success, data } = JSON.parse(
@@ -109,12 +127,12 @@ export class Raito implements IRaito {
           return;
         }
 
-        if (success && data) {
-          resolve(data);
-          return;
+        if (success) {
+          resolve(data ?? null);
         }
-        resolve(null);
       });
+
+      this.wss.send(JSON.stringify(message));
     });
   }
 
