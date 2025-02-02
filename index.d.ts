@@ -16,6 +16,7 @@ type ConnectionOptions = {
   host?: string;
   port?: number;
   ttl?: number;
+  password?: string;
 };
 type ConnectionString =
   | `raito://${string}:${number}?ttl=${number}`

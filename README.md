@@ -46,9 +46,10 @@ new Raito(7180); // localhost:7180
 new Raito('raito://localhost:9180'); // localhost:9180
 new Raito('raito://localhost:9180?ttl=5000'); // localhost:9180 and ttl 5s
 new Raito({
-  port: 9180, // Raito port
-  host: 'localhost', // Raito host
+  port: 9180,
+  host: 'localhost',
   ttl: 10000, // Cache records time to live
+  password: 'superpass123', 
 });
 ```
 
@@ -72,7 +73,7 @@ await raito.shutdown(); // Close connection
 ## Raito Deployment
 1. Pull docker image:
   ```shell
-  $ docker pull stbestich/raito-cache:latest
+  $ docker pull stbestich/raito-cache:latest_amd64
   ```
 2. Run it
   ```shell
@@ -94,6 +95,7 @@ services:
       PORT: ${PORT:-9180}
       HOST: ${HOST:-0.0.0.0}
       TTL: ${TTL}
+      PASSWORD: ${PASSWORD}
     tty: true
     stdin_open: true
 ```

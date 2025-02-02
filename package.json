@@ -22,9 +22,6 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "npx tsc && npx tsc-alias -p tsconfig.json",
-    "start": "tsx bin/index.ts",
-    "start:dev": "tsx watch bin/index.ts",
-    "start:prod": "node dist/bin/index.js",
     "lint": "eslint .",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
